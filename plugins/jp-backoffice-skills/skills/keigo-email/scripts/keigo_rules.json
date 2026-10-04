@@ -1,0 +1,16 @@
+[
+  {"id": "ryokai", "pattern": "了解(しました|です|いたしました)", "suggest": "承知しました／かしこまりました", "why": "「了解」は目上・社外には失礼と受け取られることがある", "level": "warn"},
+  {"id": "gokurousama", "pattern": "ご苦労様", "suggest": "お疲れ様です", "why": "「ご苦労様」は目上から目下へのねぎらい", "level": "error"},
+  {"id": "haiken-sareru", "pattern": "拝見(され|なさ)", "suggest": "ご覧になる", "why": "「拝見」は謙譲語。相手の行為には尊敬語を使う", "level": "error"},
+  {"id": "ossharareru", "pattern": "おっしゃられ", "suggest": "おっしゃる", "why": "二重敬語（おっしゃる＋られる）", "level": "error"},
+  {"id": "goran-ninararemasu", "pattern": "ご覧になられ", "suggest": "ご覧になる", "why": "二重敬語（ご覧になる＋られる）", "level": "error"},
+  {"id": "oukagai-sareru", "pattern": "(伺|うかが)われ", "suggest": "お聞きになる／いらっしゃる", "why": "「伺う」は謙譲語。相手の行為に使わない", "level": "error"},
+  {"id": "mairareru", "pattern": "参られ", "suggest": "いらっしゃる／お越しになる", "why": "「参る」は謙譲語。相手の行為に使わない", "level": "error"},
+  {"id": "itadaku-taberu", "pattern": "いただかれ", "suggest": "召し上がる", "why": "「いただく」は謙譲語。相手の行為に使わない", "level": "error"},
+  {"id": "sankou", "pattern": "参考になりました", "suggest": "勉強になりました", "why": "目上に「参考」は軽く聞こえることがある", "level": "info"},
+  {"id": "ni-narimasu", "pattern": "(こちら|資料|お見積り?|請求書)(が|は)?[^。\\n]{0,10}になります", "suggest": "〜です／〜でございます", "why": "「〜になります」は変化を表す。単なる提示には「です」", "level": "info"},
+  {"id": "yoroshikatta", "pattern": "よろしかったでしょうか", "suggest": "よろしいでしょうか", "why": "いわゆるバイト敬語。現在のことは現在形で", "level": "warn"},
+  {"id": "otsukaresama-desita-joushi", "pattern": "お世話様です", "suggest": "お世話になっております", "why": "「お世話様」は目上・社外には軽い", "level": "warn"},
+  {"id": "sumimasen", "pattern": "すみません", "suggest": "申し訳ございません／恐れ入ります", "why": "ビジネスメールでは口語的", "level": "info"},
+  {"id": "shiki-yoroshiku", "pattern": "取り急ぎお礼まで", "suggest": "まずはお礼を申し上げます", "why": "目上・社外には「〜まで」の省略形は避けるのが無難", "level": "info"}
+]
