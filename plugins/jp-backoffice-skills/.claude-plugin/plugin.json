@@ -1,0 +1,10 @@
+{
+  "name": "jp-backoffice-skills",
+  "version": "0.1.0",
+  "description": "インボイス対応請求書・敬語メール・稟議書・日報・経費帳など、日本の事務作業向けスキル集",
+  "author": {
+    "name": "ayukari"
+  },
+  "license": "MIT",
+  "keywords": ["japanese", "invoice", "keigo", "backoffice", "agent-skills"]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "jp-backoffice",
+  "description": "Japanese back-office Agent Skills: qualified invoices, keigo email, ringi, daily reports, tech writing",
+  "owner": {
+    "name": "ayukari"
+  },
+  "plugins": [
+    {
+      "name": "jp-backoffice-skills",
+      "source": "./plugins/jp-backoffice-skills",
+      "description": "インボイス対応請求書・敬語メール・稟議書・日報・経費帳など、日本の事務作業向けスキル集"
+    }
+  ]
+}
