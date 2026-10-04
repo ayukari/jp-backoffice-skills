@@ -42,10 +42,15 @@ def check(text):
     }
 
     date = DATE.search(text)
-    results["2_transaction_date"] = {
-        "status": "OK" if date else "不足",
-        "detail": "日付 {}-{}-{} を検出".format(*date.groups()) if date else "取引年月日が見つかりません",
-    }
+    tx = re.search(r"(取引(年月日|日|期間)|納品日|作業期間|対象期間|\d{1,2}\s*月\s*分)", text)
+    tx_pending = re.search(r"取引(年月日|日|期間)[^\n]*【要確認】", text)
+    if not date:
+        status, detail = "不足", "取引年月日が見つかりません"
+    elif tx and not tx_pending:
+        status, detail = "OK", f"取引日・期間の記載あり（{tx.group()}）"
+    else:
+        status, detail = "要確認", "請求日はあるが、取引年月日（または取引期間）の記載が見つかりません"
+    results["2_transaction_date"] = {"status": status, "detail": detail}
 
     has_items = bool(ITEM_HEADER.search(text))
     rates_used = sorted({int(m) for m in re.findall(r"(10|8)\s*[%％]", text)})

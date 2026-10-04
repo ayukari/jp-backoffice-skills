@@ -11,6 +11,7 @@ Checks:
   mixed-style     both です/ます and だ/である sentence endings in one document
   redundant       冗長表現 (することができる, という形, etc.)
   hyogen-yure     表記ゆれ (same word written two ways in one document)
+  preferred-form  a non-preferred spelling per the skill's style policy (e.g. サーバ → サーバー, 出来る → できる)
   double-ga       the particle が appearing twice in one clause, before the first 「、」
 
 Fenced code blocks and inline code are ignored.
@@ -35,16 +36,18 @@ REDUNDANT = [
     (r"まず最初に", "まず／最初に"),
 ]
 
-# Pairs of variants; if both forms appear, it is a 表記ゆれ.
+# (preferred, variant) pairs. Both present → hyogen-yure. Variant alone → preferred-form.
+# Preferred forms follow the style policy in SKILL.md.
 YURE = [
     ("サーバー", "サーバ"), ("ユーザー", "ユーザ"), ("コンピューター", "コンピュータ"),
-    ("インターフェース", "インタフェース"), ("出来る", "できる"), ("下さい", "ください"),
-    ("事が", "ことが"), ("時に", "ときに"), ("全て", "すべて"), ("予め", "あらかじめ"),
-    ("Github", "GitHub"), ("Javascript", "JavaScript"), ("Typescript", "TypeScript"),
+    ("インターフェース", "インタフェース"), ("でき", "出来"), ("ください", "下さい"),
+    ("ことが", "事が"), ("ときに", "時に"), ("すべて", "全て"), ("あらかじめ", "予め"),
+    ("GitHub", "Github"), ("JavaScript", "Javascript"), ("TypeScript", "Typescript"),
 ]
 
 DESU_MASU = re.compile(r"(です|ます|でした|ました|ません|でしょう)$")
-DA_DEARU = re.compile(r"(である|だ|だった|ではない|であった)$")
+DA_DEARU = re.compile(r"(である|だ|だった|ではない|であった|ない|[るたうくすつぬぶむ])$")
+POLITE_IMPERATIVE = re.compile(r"(ください|なさい|下さい)$")
 
 
 def strip_code(text):
@@ -78,7 +81,7 @@ def lint(text):
         if len(re.findall(r"[^\s]が", first_clause)) >= 2 and not re.search(r"ながら|ところが|だが|ですが|しかしが", first_clause):
             out.append({"line": lineno, "rule": "double-ga", "detail": "「が」が2回", "text": first_clause[:40]})
         if s.endswith("。"):
-            if DESU_MASU.search(core):
+            if DESU_MASU.search(core) or POLITE_IMPERATIVE.search(core):
                 styles["desu"].append(lineno)
             elif DA_DEARU.search(core):
                 styles["da"].append(lineno)
@@ -91,9 +94,15 @@ def lint(text):
         for pat, sug in REDUNDANT:
             for m in re.finditer(pat, line):
                 out.append({"line": lineno, "rule": "redundant", "detail": f"→ {sug}", "text": m.group()})
-    for a, b in YURE:
-        if a in text and b in text.replace(a, ""):
-            out.append({"line": None, "rule": "hyogen-yure", "detail": f"「{a}」と「{b}」が混在", "text": ""})
+    for preferred, variant in YURE:
+        has_variant = variant in text.replace(preferred, "")
+        if not has_variant:
+            continue
+        if preferred in text.replace(variant, "") if variant not in preferred else preferred in text:
+            out.append({"line": None, "rule": "hyogen-yure", "detail": f"「{preferred}」と「{variant}」が混在", "text": ""})
+        else:
+            line = next(i for i, l in enumerate(text.splitlines(), 1) if variant in l.replace(preferred, ""))
+            out.append({"line": line, "rule": "preferred-form", "detail": f"「{variant}」→「{preferred}」（表記方針）", "text": variant})
     return out
 
 

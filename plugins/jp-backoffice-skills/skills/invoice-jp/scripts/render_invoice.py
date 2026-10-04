@@ -6,7 +6,10 @@ Usage:
   python3 render_invoice.py invoice.json --html     # HTML
 
 Input JSON is the same as invoice_calc.py, plus optional fields:
+  "transaction_date" (取引年月日) or "period": {"from": ..., "to": ...} (取引期間),
   "invoice_number", "due_date", "bank" (振込先), "notes".
+"date" is the invoice issue date (請求日). The transaction date is a required item of a
+qualified invoice; if neither transaction_date nor period is given, it is printed as 【要確認】.
 """
 import html
 import json
@@ -25,6 +28,14 @@ def jp_date(iso):
     return f"{d.year}年{d.month}月{d.day}日"
 
 
+def transaction_label(inv):
+    if inv.get("period"):
+        return f"{jp_date(inv['period']['from'])}〜{jp_date(inv['period']['to'])}"
+    if inv.get("transaction_date"):
+        return jp_date(inv["transaction_date"])
+    return "【要確認】"
+
+
 def item_rows(inv):
     rows = []
     for item in inv["items"]:
@@ -41,7 +52,7 @@ def render_markdown(inv, calc):
     meta = f"請求日: {jp_date(inv['date'])}"
     if inv.get("invoice_number"):
         meta += f"　　請求番号: {inv['invoice_number']}"
-    lines += [meta, "", f"{inv['recipient']} 御中", ""]
+    lines += [meta, f"取引年月日: {transaction_label(inv)}", "", f"{inv['recipient']} 御中", ""]
     lines += [f"発行者: {inv['issuer']['name']}（登録番号: {inv['issuer']['registration_number']}）", ""]
     lines += [f"**ご請求金額（税込）: {yen(calc['total_incl_tax'])}円**", ""]
     lines += [f"| 品目 | 数量 | 単価（{mode}） | 金額（{mode}） | 税率 |", "|---|---:|---:|---:|---:|"]
@@ -89,6 +100,7 @@ def render_html(inv, calc):
 td,th{{border:1px solid #999;padding:4px 8px}}.n{{text-align:right}}.total{{font-size:1.3em;font-weight:bold}}</style></head>
 <body><h1>請求書</h1>
 <p>請求日: {jp_date(inv['date'])}{number}</p>
+<p>取引年月日: {transaction_label(inv)}</p>
 <p>{e(inv['recipient'])} 御中</p>
 <p>発行者: {e(inv['issuer']['name'])}（登録番号: {e(inv['issuer']['registration_number'])}）</p>
 <p class=total>ご請求金額（税込）: {yen(calc['total_incl_tax'])}円</p>

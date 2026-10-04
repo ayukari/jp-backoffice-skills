@@ -11,6 +11,11 @@ class CheckInvoiceTest(unittest.TestCase):
         out = check(render_markdown(INV, calculate(INV)))
         self.assertEqual(out["overall"], "OK", out)
 
+    def test_only_issue_date_needs_check(self):
+        inv = {k: v for k, v in INV.items() if k != "transaction_date"}
+        out = check(render_markdown(inv, calculate(inv)))
+        self.assertEqual(out["items"]["2_transaction_date"]["status"], "要確認")
+
     def test_missing_registration_number(self):
         text = render_markdown(INV, calculate(INV)).replace("T1234567890123", "")
         out = check(text)
@@ -23,6 +28,7 @@ class CheckInvoiceTest(unittest.TestCase):
 株式会社テスト 御中
 2026年10月4日
 登録番号 T1234567890123
+取引日 2026年10月1日
 品目 作業A 3 333 999 10%
 | 10%対象 | 999 | 98 |
 """

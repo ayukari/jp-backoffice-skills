@@ -20,6 +20,15 @@ class StyleLintTest(unittest.TestCase):
         self.assertIn("hyogen-yure", rules("サーバーを起動します。次にサーバを止めます。"))
         self.assertNotIn("hyogen-yure", rules("サーバーを起動します。次にサーバーを止めます。"))
 
+    def test_plain_form_mixed_with_polite(self):
+        self.assertIn("mixed-style", rules("サーバーを監視します。ユーザーは状態を見ることができる。"))
+        self.assertNotIn("mixed-style", rules("設定を開きます。保存してください。"))
+
+    def test_preferred_form_alone(self):
+        self.assertIn("preferred-form", rules("ユーザが使います。"))
+        self.assertIn("preferred-form", rules("見ることが出来ます。"))
+        self.assertNotIn("preferred-form", rules("ユーザーが使います。サーバーです。"))
+
     def test_long_sentence_and_commas(self):
         long = "これは" + "とても" * 40 + "長い文です。"
         self.assertIn("long-sentence", rules(long))
