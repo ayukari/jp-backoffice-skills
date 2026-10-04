@@ -1,6 +1,6 @@
 ---
 name: invoice-jp
-description: インボイス制度（適格請求書等保存方式）に対応した請求書・見積書・領収書を作成・点検する。「請求書を作って」「インボイス対応か確認して」「適格請求書」「登録番号」「消費税の端数」などで使う。Japanese qualified-invoice generator and checker.
+description: インボイス制度（適格請求書等保存方式）に対応した請求書を作成・点検する（取引年月日・登録番号・税率ごとの消費税額などの記載漏れチェックつき）。「請求書を作って」「インボイス対応か確認して」「適格請求書」「登録番号」「消費税の端数」などで使う。Japanese qualified-invoice generator and checker.
 ---
 
 # invoice-jp: 適格請求書の作成と点検
