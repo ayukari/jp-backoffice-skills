@@ -27,7 +27,12 @@ description: インボイス制度（適格請求書等保存方式）に対応�
    python3 scripts/invoice_calc.py invoice.json
    ```
    `ok: false` が返ったら、`errors` の内容をユーザーに伝えて直す。
-3. 計算結果を使い、次の形式で請求書を出力する（希望があればHTMLも）。
+3. 請求書を出力する。`scripts/render_invoice.py` が同じJSONから請求書を作る（任意項目: `invoice_number`, `due_date`, `bank`, `notes`）。
+   ```bash
+   python3 scripts/render_invoice.py invoice.json          # Markdown
+   python3 scripts/render_invoice.py invoice.json --html   # HTML（印刷・PDF化用）
+   ```
+   出力例（Markdown）:
 
 ```markdown
 # 請求書
