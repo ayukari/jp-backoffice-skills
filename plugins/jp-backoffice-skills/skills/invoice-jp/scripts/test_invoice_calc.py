@@ -22,6 +22,17 @@ class InvoiceCalcTest(unittest.TestCase):
         self.assertEqual(out["by_rate"][1]["tax"], 99)
         self.assertEqual(out["total_incl_tax"], 1081 + 1098)
 
+    def test_per_rate_differs_from_per_line(self):
+        # 3 lines of 105 yen at 10%.
+        # Per line (not allowed): floor(10.5) = 10, x3 = 30 yen.
+        # Per rate (required):     floor(315 x 0.1) = floor(31.5) = 31 yen.
+        inv = {**BASE, "items": [
+            {"name": "部品A", "qty": 1, "unit_price": 105, "rate": 10},
+            {"name": "部品B", "qty": 1, "unit_price": 105, "rate": 10},
+            {"name": "部品C", "qty": 1, "unit_price": 105, "rate": 10},
+        ]}
+        self.assertEqual(calculate(inv)["by_rate"][0]["tax"], 31)
+
     def test_inclusive_prices(self):
         inv = {**BASE, "price_mode": "inclusive", "items": [{"name": "x", "unit_price": 11000, "rate": 10}]}
         self.assertEqual(calculate(inv)["by_rate"][0]["tax"], 1000)
