@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.0] - unreleased
+## [0.1.0] - 2026-10-05
 
 ### Added
 - `invoice-jp`: qualified-invoice calculator (one rounding per tax rate), Markdown/HTML renderer with 取引年月日 or 取引期間, and a text invoice checker for the 6 required items.
@@ -10,3 +10,6 @@
 - `jp-tech-writing`: style linter (mixed style, 表記ゆれ, preferred forms, redundant phrases, long sentences, double が).
 - `expense-ledger-jp`: expense ledger CSV format, account title guide, and CSV parsing notes.
 - 18 evals (3 per skill) and GitHub Actions CI for script tests.
+
+### Notes
+- Bundled scripts are referenced as `${CLAUDE_SKILL_DIR}/scripts/...` so they work from any working directory.
