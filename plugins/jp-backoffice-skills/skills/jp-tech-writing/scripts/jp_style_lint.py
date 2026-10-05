@@ -44,6 +44,25 @@ YURE = [
     ("ことが", "事が"), ("ときに", "時に"), ("すべて", "全て"), ("あらかじめ", "予め"),
     ("GitHub", "Github"), ("JavaScript", "Javascript"), ("TypeScript", "Typescript"),
 ]
+# Variants that are also parts of ordinary words get a stricter pattern:
+# 同時に・実行時に (kanji + 時に), 仕事が・記事が (kanji + 事が), 出来事・出来高.
+KANJI = "\u4e00-\u9fff々"
+VARIANT_RE = {
+    "時に": re.compile(f"(?<![{KANJI}])時に"),
+    "事が": re.compile(f"(?<![{KANJI}])事が"),
+    "出来": re.compile("出来(?![事高])"),
+}
+
+
+def _variant_lines(text, preferred, variant):
+    """Line numbers where the non-preferred variant really appears."""
+    pat = VARIANT_RE.get(variant)
+    lines = []
+    for i, l in enumerate(text.splitlines(), 1):
+        l = l.replace(preferred, "")
+        if (pat.search(l) if pat else variant in l):
+            lines.append(i)
+    return lines
 
 DESU_MASU = re.compile(r"(です|ます|でした|ました|ません|でしょう)$")
 DA_DEARU = re.compile(r"(である|だ|だった|ではない|であった|ない|[るたうくすつぬぶむ])$")
@@ -95,14 +114,13 @@ def lint(text):
             for m in re.finditer(pat, line):
                 out.append({"line": lineno, "rule": "redundant", "detail": f"→ {sug}", "text": m.group()})
     for preferred, variant in YURE:
-        has_variant = variant in text.replace(preferred, "")
-        if not has_variant:
+        lines = _variant_lines(text, preferred, variant)
+        if not lines:
             continue
         if preferred in text.replace(variant, "") if variant not in preferred else preferred in text:
             out.append({"line": None, "rule": "hyogen-yure", "detail": f"「{preferred}」と「{variant}」が混在", "text": ""})
         else:
-            line = next(i for i, l in enumerate(text.splitlines(), 1) if variant in l.replace(preferred, ""))
-            out.append({"line": line, "rule": "preferred-form", "detail": f"「{variant}」→「{preferred}」（表記方針）", "text": variant})
+            out.append({"line": lines[0], "rule": "preferred-form", "detail": f"「{variant}」→「{preferred}」（表記方針）", "text": variant})
     return out
 
 

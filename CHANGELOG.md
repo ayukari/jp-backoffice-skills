@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Fixed
+- `jp-tech-writing` linter: 時に / 事が / 出来 are no longer flagged inside ordinary compound words (同時に, 実行時に, 仕事が, 記事が, 出来事, 出来高).
 - `invoice-jp` checker: a tax mismatch is no longer always blamed on per-line rounding. It now says per-line rounding **or a calculation error**, since some mismatches (e.g. 999 yen at 10% shown as 98) fit no rounding method.
 
 ## [0.1.0] - 2026-10-05

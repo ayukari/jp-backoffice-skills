@@ -29,6 +29,13 @@ class StyleLintTest(unittest.TestCase):
         self.assertIn("preferred-form", rules("見ることが出来ます。"))
         self.assertNotIn("preferred-form", rules("ユーザーが使います。サーバーです。"))
 
+    def test_compound_words_are_not_variants(self):
+        # 同時に・実行時に・仕事が・出来事 are ordinary words, not 時に/事が/出来.
+        for text in ["同時に処理します。", "実行時に確認します。", "仕事が増えます。", "出来事を記録します。"]:
+            self.assertNotIn("preferred-form", rules(text), text)
+        self.assertIn("preferred-form", rules("起動した時に表示されます。"))
+        self.assertIn("preferred-form", rules("その事が問題です。"))
+
     def test_long_sentence_and_commas(self):
         long = "これは" + "とても" * 40 + "長い文です。"
         self.assertIn("long-sentence", rules(long))
