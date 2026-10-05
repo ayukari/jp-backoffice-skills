@@ -77,7 +77,7 @@ def check(text):
     results["5_tax_by_rate"] = {
         "status": "OK" if tax_checks and all(c["ok"] for c in tax_checks) else ("不足" if not tax_checks else "要確認"),
         "detail": "税額は税率ごとの端数処理1回と一致" if tax_checks and all(c["ok"] for c in tax_checks)
-        else ("税率ごとの消費税額が見つかりません" if not tax_checks else "税額が再計算と一致しません（明細ごとの端数処理の可能性）"),
+        else ("税率ごとの消費税額が見つかりません" if not tax_checks else "税額が再計算と一致しません（明細ごとの端数処理、または計算誤りの可能性）"),
         "checks": tax_checks,
     }
 
