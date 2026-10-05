@@ -32,6 +32,29 @@ def expected_taxes(base, rate):
     return {int((Decimal(base) * r).quantize(Decimal(1), rounding=m)) for m in (ROUND_FLOOR, ROUND_HALF_UP, ROUND_CEILING)}
 
 
+# An item line: amount followed by the tax rate, e.g. "| 部品A | 1 | 105 | 105 | 10% |" or "作業A 3 333 999 10%".
+ITEM_LINE = re.compile(r"([\d,]+)\D{0,6}?(10|8)\s*[%％]")
+
+
+def item_amounts(text):
+    """Line amounts per rate, from item lines (summary lines with 対象 are skipped)."""
+    by_rate = {}
+    for line in text.splitlines():
+        if "対象" in line:
+            continue
+        m = ITEM_LINE.search(line)
+        if m and num(m.group(1)) > 0:
+            by_rate.setdefault(int(m.group(2)), []).append(num(m.group(1)))
+    return by_rate
+
+
+def per_line_taxes(amounts, rate):
+    """Tax totals if each line were rounded separately (not allowed for qualified invoices)."""
+    r = Decimal(rate) / 100
+    return {sum(int((Decimal(a) * r).quantize(Decimal(1), rounding=m)) for a in amounts)
+            for m in (ROUND_FLOOR, ROUND_HALF_UP, ROUND_CEILING)}
+
+
 def check(text):
     results = {}
 
@@ -62,11 +85,25 @@ def check(text):
     }
 
     summaries = [(int(m.group(1)), num(m.group(2)), num(m.group(3))) for m in RATE_LINE.finditer(text)]
+    lines_by_rate = item_amounts(text)
     tax_checks = []
     for rate, base, tax in summaries:
         ok = tax in expected_taxes(base, rate)
-        tax_checks.append({"rate": rate, "base_excl_tax": base, "tax_on_invoice": tax,
-                           "tax_expected": sorted(expected_taxes(base, rate)), "ok": ok})
+        c = {"rate": rate, "base_excl_tax": base, "tax_on_invoice": tax,
+             "tax_expected": sorted(expected_taxes(base, rate)), "ok": ok}
+        amounts = lines_by_rate.get(rate, [])
+        if not ok and amounts and sum(amounts) == base:
+            per_line = per_line_taxes(amounts, rate)
+            c["tax_if_rounded_per_line"] = sorted(per_line)
+            c["cause"] = "明細ごとの端数処理" if tax in per_line else "計算誤り"
+        tax_checks.append(c)
+    causes = {c.get("cause") for c in tax_checks if not c["ok"]}
+    if causes == {"明細ごとの端数処理"}:
+        mismatch = "税額が再計算と一致しません（明細ごとに端数処理しています。税率ごとに1回で計算し直してください）"
+    elif causes == {"計算誤り"}:
+        mismatch = "税額が再計算と一致しません（どの端数処理でも説明できないため、計算誤りの可能性があります）"
+    else:
+        mismatch = "税額が再計算と一致しません（明細ごとの端数処理、または計算誤りの可能性）"
     summarized = {s[0] for s in summaries}
     missing_rates = [r for r in rates_used if r not in summarized]
     results["4_totals_by_rate_and_rate"] = {
@@ -77,7 +114,7 @@ def check(text):
     results["5_tax_by_rate"] = {
         "status": "OK" if tax_checks and all(c["ok"] for c in tax_checks) else ("不足" if not tax_checks else "要確認"),
         "detail": "税額は税率ごとの端数処理1回と一致" if tax_checks and all(c["ok"] for c in tax_checks)
-        else ("税率ごとの消費税額が見つかりません" if not tax_checks else "税額が再計算と一致しません（明細ごとの端数処理、または計算誤りの可能性）"),
+        else ("税率ごとの消費税額が見つかりません" if not tax_checks else mismatch),
         "checks": tax_checks,
     }
 
