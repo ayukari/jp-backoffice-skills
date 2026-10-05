@@ -22,15 +22,15 @@ description: インボイス制度（適格請求書等保存方式）に対応�
 
 ## 手順
 1. 上の6項目の情報を集める。足りないものだけまとめて質問する。**請求日（発行日）と取引年月日は別物**なので、取引日（または「9月分」などの取引期間）が分からなければ必ず確認する。JSONでは `date`＝請求日、`transaction_date`＝取引日、または `period: {"from","to"}`＝取引期間。
-2. 明細をJSONにして `scripts/invoice_calc.py`（このスキルのフォルダ内） に渡す。端数処理は**1請求書につき税率ごとに1回**で、明細ごとの端数処理は不可。
+2. 明細をJSONにして `${CLAUDE_SKILL_DIR}/scripts/invoice_calc.py` に渡す。端数処理は**1請求書につき税率ごとに1回**で、明細ごとの端数処理は不可。
    ```bash
-   python3 scripts/invoice_calc.py invoice.json
+   python3 ${CLAUDE_SKILL_DIR}/scripts/invoice_calc.py invoice.json
    ```
    `ok: false` が返ったら、`errors` の内容をユーザーに伝えて直す。
 3. 請求書を出力する。`scripts/render_invoice.py` が同じJSONから請求書を作る（任意項目: `invoice_number`, `due_date`, `bank`, `notes`）。
    ```bash
-   python3 scripts/render_invoice.py invoice.json          # Markdown
-   python3 scripts/render_invoice.py invoice.json --html   # HTML（印刷・PDF化用）
+   python3 ${CLAUDE_SKILL_DIR}/scripts/render_invoice.py invoice.json          # Markdown
+   python3 ${CLAUDE_SKILL_DIR}/scripts/render_invoice.py invoice.json --html   # HTML（印刷・PDF化用）
    ```
    出力例（Markdown）:
 
@@ -57,7 +57,7 @@ description: インボイス制度（適格請求書等保存方式）に対応�
 ## 点検モード
 既存の請求書を点検する場合は、テキスト化した請求書（PDFから抽出した文字でも可）を `scripts/check_invoice.py` に渡す。
 ```bash
-python3 scripts/check_invoice.py invoice.txt
+python3 ${CLAUDE_SKILL_DIR}/scripts/check_invoice.py invoice.txt
 ```
 6項目それぞれが「OK / 不足 / 要確認」で返り、税率ごとの税額を再計算して照合する（明細ごとの端数処理による差異も検出）。
 結果を表にまとめ、「不足」「要確認」の項目について直し方を示す。スクリプトはテキストの機械的なチェックなので、発行者名などは必ず目視でも確認する。

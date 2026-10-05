@@ -8,7 +8,7 @@ description: 日本語の技術文書（README、設計書、手順書、技術�
 ## 手順
 1. まず機械チェックをかける（コードブロックとインラインコードは対象外）。
    ```bash
-   python3 scripts/jp_style_lint.py doc.md
+   python3 ${CLAUDE_SKILL_DIR}/scripts/jp_style_lint.py doc.md
    ```
 2. 指摘を種類ごとにまとめ、修正案を示す。機械チェックは目安なので、文脈で判断して不要な指摘は捨てる。
 3. 機械では拾えない点を人の目で確認する（下の「読み手目線のチェック」）。

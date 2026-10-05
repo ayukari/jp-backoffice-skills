@@ -39,7 +39,7 @@ description: 日本語ビジネスメールを、相手との関係と目的に�
 ## 機械チェック
 **作成時も添削時も**、出力前に `scripts/keigo_lint.py` で定番の誤り（二重敬語、相手の行為への謙譲語、「了解しました」など）を拾い、そのうえで文脈を読んで直す。
 ```bash
-python3 scripts/keigo_lint.py email.txt
+python3 ${CLAUDE_SKILL_DIR}/scripts/keigo_lint.py email.txt
 ```
 `error` は必ず直す。`warn` と `info` は相手との関係を踏まえて判断する。ルールは `scripts/keigo_rules.json` で追加できる。
 
