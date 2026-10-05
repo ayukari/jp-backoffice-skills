@@ -125,6 +125,10 @@ def lint(text):
 
 
 def main():
+    if "-h" in sys.argv or "--help" in sys.argv or (len(sys.argv) == 1 and sys.stdin.isatty()):
+        # No file and nothing piped in: show usage instead of waiting on stdin.
+        print(__doc__.strip())
+        sys.exit(0 if len(sys.argv) > 1 else 2)
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     text = open(args[0], encoding="utf-8").read() if args else sys.stdin.read()
     findings = lint(text)

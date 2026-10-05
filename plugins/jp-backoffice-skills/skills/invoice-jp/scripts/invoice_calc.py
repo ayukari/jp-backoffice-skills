@@ -76,6 +76,10 @@ def calculate(inv):
 
 
 def main():
+    if "-h" in sys.argv or "--help" in sys.argv or (len(sys.argv) == 1 and sys.stdin.isatty()):
+        # No file and nothing piped in: show usage instead of waiting on stdin.
+        print(__doc__.strip())
+        sys.exit(0 if len(sys.argv) > 1 else 2)
     inv = json.load(open(sys.argv[1]) if len(sys.argv) > 1 else sys.stdin)
     errors = validate(inv)
     if errors:
