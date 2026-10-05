@@ -58,7 +58,7 @@ def strip_code(text):
 def sentences(text):
     for lineno, line in enumerate(text.splitlines(), 1):
         body = line.strip()
-        if not body or body.startswith(("#", "|", ">", "-", "*", "1.", "http")) and not body.endswith("。"):
+        if not body or body.startswith(("[", "!", "<")) or body.startswith(("#", "|", ">", "-", "*", "1.", "http")) and not body.endswith("。"):
             continue
         body = re.sub(r"^[-*]\s+|^\d+\.\s+", "", body)
         for s in re.split(r"(?<=[。！？])", body):
