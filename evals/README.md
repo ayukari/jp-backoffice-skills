@@ -14,5 +14,6 @@ claude plugin eval ./plugins/jp-backoffice-skills --tag invoice-jp --runs 1     
 ```
 
 - Skills that run scripts need `--allow-tools Bash Write`. Without it, the agent answers without the script.
+- A Bash grant also needs the OS sandbox backend. On Linux, install `bubblewrap` and `socat` first, or every case exits with "sandbox required but unavailable" (seen on 2026-10-07 in a container without them).
 - **Use `--judge-model sonnet`.** On 2026-10-06, the default judge (haiku) failed a correct Japanese answer to `invoice-02-missing-info` 3/3. Sonnet passed the same kind of answer 3/3 on a re-run. The checklists are in Japanese and need a stronger judge.
 - By default each case runs 3 times and also runs a no-plugin baseline, so a full run costs real usage. Filter with `--case` / `--tag` while iterating.
