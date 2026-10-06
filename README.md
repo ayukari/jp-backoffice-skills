@@ -37,8 +37,8 @@ claude plugin install jp-backoffice-skills@jp-backoffice
 
 ## 品質
 
-- スクリプトは単体テスト付きで、push ごとに GitHub Actions で実行しています（25件）。
-- `evals/` に、スキルごとの評価プロンプト（21件）と期待される振る舞いを置いています。結果は `evals/results/` にあります。
+- スクリプトは単体テスト付きで、push ごとに GitHub Actions で実行しています（4スキル・45件）。
+- `evals/` に、スキルごとの評価プロンプト（21件）と期待される振る舞いを置いています。結果は `evals/results/` にあります。同じ21件を `claude plugin eval` でも実行できます（`evals/README.md`）。
 
 ## 注意
 
