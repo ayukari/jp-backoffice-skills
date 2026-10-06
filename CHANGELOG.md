@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- `invoice-jp`: 源泉徴収 (withholding) for fee lines marked `"withholding": true` (10.21% up to 1,000,000 yen, 20.42% above, rounded down) and 立替金 (reimbursements, outside consumption tax). The calculator returns `withholding_tax`, `reimbursements_total` and `amount_due`, and the renderer shows a breakdown. Whether withholding applies is left to the user.
+
 ## [0.1.1] - 2026-10-06
 
 ### Fixed

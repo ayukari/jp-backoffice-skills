@@ -46,6 +46,10 @@ def item_rows(inv):
     return rows
 
 
+def amount_due(calc):
+    return calc.get("amount_due", calc["total_incl_tax"])
+
+
 def render_markdown(inv, calc):
     mode = "税込" if inv.get("price_mode") == "inclusive" else "税抜"
     lines = ["# 請求書", ""]
@@ -54,7 +58,8 @@ def render_markdown(inv, calc):
         meta += f"　　請求番号: {inv['invoice_number']}"
     lines += [meta, f"取引年月日: {transaction_label(inv)}", "", f"{inv['recipient']} 御中", ""]
     lines += [f"発行者: {inv['issuer']['name']}（登録番号: {inv['issuer']['registration_number']}）", ""]
-    lines += [f"**ご請求金額（税込）: {yen(calc['total_incl_tax'])}円**", ""]
+    lines += [f"**ご請求金額: {yen(amount_due(calc))}円**" if "amount_due" in calc
+              else f"**ご請求金額（税込）: {yen(calc['total_incl_tax'])}円**", ""]
     lines += [f"| 品目 | 数量 | 単価（{mode}） | 金額（{mode}） | 税率 |", "|---|---:|---:|---:|---:|"]
     lines += [f"| {n} | {q} | {u} | {a} | {r} |" for n, q, u, a, r in item_rows(inv)]
     lines += ["", "| 税率 | 対象額（税抜） | 消費税額 | 合計（税込） |", "|---|---:|---:|---:|"]
@@ -63,6 +68,13 @@ def render_markdown(inv, calc):
         lines.append(f"| {label} | {yen(s['subtotal_excl_tax'])} | {yen(s['tax'])} | {yen(s['subtotal_incl_tax'])} |")
     if any(s["reduced"] for s in calc["by_rate"]):
         lines += ["", "※は軽減税率（8%）対象品目です。"]
+    if "amount_due" in calc:
+        lines += ["", "| 内訳 | 金額 |", "|---|---:|", f"| 小計（税込） | {yen(calc['total_incl_tax'])} |"]
+        if calc["withholding_tax"]:
+            lines.append(f"| 源泉徴収税額 | -{yen(calc['withholding_tax'])} |")
+        for r in inv.get("reimbursements", []):
+            lines.append(f"| 立替金：{r['name']}（不課税） | {yen(int(r['amount']))} |")
+        lines.append(f"| ご請求金額 | {yen(calc['amount_due'])} |")
     if inv.get("due_date"):
         lines += ["", f"お支払期限: {jp_date(inv['due_date'])}"]
     if inv.get("bank"):
@@ -87,6 +99,14 @@ def render_html(inv, calc):
     extra = ""
     if any(s["reduced"] for s in calc["by_rate"]):
         extra += "<p>※は軽減税率（8%）対象品目です。</p>"
+    if "amount_due" in calc:
+        rows_due = f"<tr><td>小計（税込）</td><td class=n>{yen(calc['total_incl_tax'])}</td></tr>"
+        if calc["withholding_tax"]:
+            rows_due += f"<tr><td>源泉徴収税額</td><td class=n>-{yen(calc['withholding_tax'])}</td></tr>"
+        for r in inv.get("reimbursements", []):
+            rows_due += f"<tr><td>立替金：{e(r['name'])}（不課税）</td><td class=n>{yen(int(r['amount']))}</td></tr>"
+        rows_due += f"<tr><td>ご請求金額</td><td class=n>{yen(calc['amount_due'])}</td></tr>"
+        extra += f"<table><tr><th>内訳</th><th>金額</th></tr>{rows_due}</table>"
     if inv.get("due_date"):
         extra += f"<p>お支払期限: {jp_date(inv['due_date'])}</p>"
     if inv.get("bank"):
@@ -103,7 +123,7 @@ td,th{{border:1px solid #999;padding:4px 8px}}.n{{text-align:right}}.total{{font
 <p>取引年月日: {transaction_label(inv)}</p>
 <p>{e(inv['recipient'])} 御中</p>
 <p>発行者: {e(inv['issuer']['name'])}（登録番号: {e(inv['issuer']['registration_number'])}）</p>
-<p class=total>ご請求金額（税込）: {yen(calc['total_incl_tax'])}円</p>
+<p class=total>{"ご請求金額" if "amount_due" in calc else "ご請求金額（税込）"}: {yen(amount_due(calc))}円</p>
 <table><tr><th>品目</th><th>数量</th><th>単価</th><th>金額</th><th>税率</th></tr>{rows}</table>
 <table><tr><th>税率</th><th>対象額（税抜）</th><th>消費税額</th><th>合計（税込）</th></tr>{tax_rows}</table>
 {extra}</body></html>

@@ -11,8 +11,16 @@ Input JSON:
   "date": "2026-10-04",
   "price_mode": "exclusive" | "inclusive",
   "rounding": "floor" | "round" | "ceil",
-  "items": [{"name": "...", "qty": 1, "unit_price": 1000, "rate": 10}]
+  "items": [{"name": "...", "qty": 1, "unit_price": 1000, "rate": 10,
+             "withholding": true}],            # optional: fee subject to 源泉徴収
+  "reimbursements": [{"name": "交通費（立替）", "amount": 1200}]   # optional: 立替金, outside tax
 }
+
+Withholding (源泉徴収) is 10.21% of the base up to 1,000,000 yen and 20.42% above it,
+rounded down to the yen. The base is the withholding items' amount excluding tax
+(price_mode "exclusive") or including tax ("inclusive"). Whether withholding applies
+at all is a tax judgment for the user, not for this script.
+Reimbursements (立替金) are added to the amount due but not to taxable totals.
 """
 import json
 import re
@@ -40,7 +48,18 @@ def validate(inv):
     for i, item in enumerate(inv.get("items", [])):
         if item.get("rate") not in RATES:
             errors.append(f"items[{i}].rate must be 8 or 10")
+    for i, r in enumerate(inv.get("reimbursements", [])):
+        if not r.get("name") or not isinstance(r.get("amount"), (int, float)) or r["amount"] < 0:
+            errors.append(f"reimbursements[{i}] needs a name and a non-negative amount (立替金)")
     return errors
+
+
+def withholding_tax(base):
+    """源泉徴収税額: 10.21% up to 1,000,000 yen, 20.42% on the excess, rounded down."""
+    base = Decimal(base)
+    first = min(base, Decimal(1_000_000))
+    tax = first * Decimal("0.1021") + max(base - first, Decimal(0)) * Decimal("0.2042")
+    return int(tax.quantize(Decimal(1), rounding=ROUND_FLOOR))
 
 
 def calculate(inv):
@@ -68,11 +87,24 @@ def calculate(inv):
             "tax": int(tax),
             "subtotal_incl_tax": int(incl),
         })
-    return {
+    total_incl = sum(s["subtotal_incl_tax"] for s in summary)
+    result = {
         "by_rate": summary,
-        "total_incl_tax": sum(s["subtotal_incl_tax"] for s in summary),
+        "total_incl_tax": total_incl,
         "total_tax": sum(s["tax"] for s in summary),
     }
+    wh_base = sum(Decimal(str(i["unit_price"])) * Decimal(str(i.get("qty", 1)))
+                  for i in inv["items"] if i.get("withholding"))
+    reimb = sum(int(r["amount"]) for r in inv.get("reimbursements", []))
+    if wh_base or reimb:
+        wh = withholding_tax(wh_base) if wh_base else 0
+        result.update({
+            "withholding_base": int(wh_base),
+            "withholding_tax": wh,
+            "reimbursements_total": reimb,
+            "amount_due": total_incl - wh + reimb,
+        })
+    return result
 
 
 def main():
