@@ -70,7 +70,10 @@ def main(argv=None, client=None):
         return 2
     client = client or EgovClient()
     try:
-        res = client.search_laws(title=a.title, law_id=a.law_id, limit=max(1, min(a.limit, 50)))
+        # For an article lookup, fetch more candidates so an exact title match isn't cut off
+        # (e.g. 「民法」 also matches 民法施行法 and others).
+        limit = 50 if a.article else max(1, min(a.limit, 50))
+        res = client.search_laws(title=a.title, law_id=a.law_id, limit=limit)
         laws = [summarize_law(x) for x in res.get("laws", [])]
         if not laws:
             print("該当する法令が見つかりません（記憶で補わないこと）", file=sys.stderr)

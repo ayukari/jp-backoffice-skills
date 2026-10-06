@@ -52,6 +52,7 @@ class LawLookupTest(unittest.TestCase):
         self.assertTrue(out.startswith("第三十条（仕入れに係る消費税額の控除）"))
         self.assertIn("出典: 消費税法（昭和六十三年法律第百八号）", out)
         self.assertIn(("article", "363AC0000000108", "30"), c.calls)
+        self.assertEqual(c.calls[0][1]["limit"], 50)  # wide search so the exact title is found
 
     def test_search_only_lists_laws(self):
         code, out, _ = run(["--title", "消費税法"], FakeClient())
