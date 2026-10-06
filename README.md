@@ -15,6 +15,7 @@
 | `nippo-jp` | 日報・週報の作成と、日報から週報への要約。メモや git log から下書き | — |
 | `jp-tech-writing` | README・手順書・技術記事の校正 | 文体混在・表記ゆれ・冗長表現・長文の検出 |
 | `expense-ledger-jp` | 明細やレシートから勘定科目つき経費帳CSVを作成。家事按分は勝手に決めず確認 | — |
+| `houki-lookup` | 法令の条文を e-Gov 法令API（公式データ）から取得し、原文を引用して説明。取得できなければ記憶で補わない | 法令検索・条文取得（項・号つきテキスト、出典つき） |
 
 ## インストール
 
@@ -62,5 +63,6 @@ Claude Code plugin with Agent Skills for Japanese back-office work:
 | `nippo-jp` | Daily and weekly reports |
 | `jp-tech-writing` | Japanese technical writing proofreading, with a linter |
 | `expense-ledger-jp` | Expense ledger CSV for sole proprietors |
+| `houki-lookup` | Japanese law articles from the official e-Gov Law API, quoted with source |
 
 Install with `claude plugin marketplace add ayukari/jp-backoffice-skills`, then `claude plugin install jp-backoffice-skills@jp-backoffice`.
