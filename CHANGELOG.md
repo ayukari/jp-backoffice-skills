@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### Added
-- `invoice-jp`: 源泉徴収 (withholding) for fee lines marked `"withholding": true` (10.21% up to 1,000,000 yen, 20.42% above, rounded down) and 立替金 (reimbursements, outside consumption tax). The calculator returns `withholding_tax`, `reimbursements_total` and `amount_due`, and the renderer shows a breakdown. Whether withholding applies is left to the user.
+- `invoice-jp`: 源泉徴収 (withholding) for fee lines marked `"withholding": true` (10.21% up to 1,000,000 yen, 20.42% above, rounded down) and 立替金 (reimbursements, outside consumption tax). The calculator returns `withholding_tax`, `reimbursements_total` and `amount_due`, and the renderer shows a breakdown. Whether withholding applies is left to the user. 10 new unit tests and 1 new eval (invoice-04-withholding).
 
 ## [0.1.1] - 2026-10-06
 
@@ -15,7 +15,7 @@
 ## [0.1.0] - 2026-10-05
 
 ### Added
-- `invoice-jp`: qualified-invoice calculator (one rounding per tax rate), Markdown/HTML renderer with 取引年月日 or 取引期間, and a text invoice checker for the 6 required items.
+- `invoice-jp`: qualified-invoice calculator (one rounding per tax rate), Markdown/HTML renderer with 取引年月日 or 取引期間, and a text invoice checker for the 6 required items. 10 new unit tests and 1 new eval (invoice-04-withholding).
 - `keigo-email`: keigo linter (JSON rules) and 8 purpose templates.
 - `ringi-jp`: 稟議書 structure, review mode, and a worked example.
 - `nippo-jp`: daily and weekly report formats and a weekly summary mode.
