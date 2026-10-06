@@ -1,9 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [0.2.0] - 2026-10-06
 
 ### Added
-- New skill `houki-lookup`: fetch Japanese law articles from the official e-Gov 法令API v2 and quote them with source (law number, enforcement date, URL). Accepts 30 / 第30条 / 57の4 / 第五十七条の四, prefers an exact title match, and never fills in text from memory when a lookup fails (exit 1). Stdlib only; 6 tests run against recorded API responses.
+- Evals as `claude plugin eval` cases in `plugins/jp-backoffice-skills/evals/` (21 cases, one per prompt in `evals/evals.json`). See `evals/README.md`; use `--judge-model sonnet` for the Japanese checklists.
+- New skill `houki-lookup`: fetch Japanese law articles from the official e-Gov 法令API v2 and quote them with source (law number, enforcement date, URL). Accepts 30 / 第30条 / 57の4 / 第五十七条の四, prefers an exact title match, and never fills in text from memory when a lookup fails (exit 1). Stdlib only; 6 tests run against recorded API responses; 2 evals.
 - `invoice-jp`: 源泉徴収 (withholding) for fee lines marked `"withholding": true` (10.21% up to 1,000,000 yen, 20.42% above, rounded down) and 立替金 (reimbursements, outside consumption tax). The calculator returns `withholding_tax`, `reimbursements_total` and `amount_due`, and the renderer shows a breakdown. Whether withholding applies is left to the user. 10 new unit tests and 1 new eval (invoice-04-withholding).
 
 ## [0.1.1] - 2026-10-06
